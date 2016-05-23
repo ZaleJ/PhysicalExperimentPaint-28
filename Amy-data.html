@@ -1,0 +1,205 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Line Chart</title>
+    <script src="../dist/Chart.bundle.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <style>
+    canvas {
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+    }
+    </style>
+</head>
+
+<body>
+    <div style="width:100%;">
+        <canvas id="canvas"></canvas>
+    </div>
+    <br>
+    <br>
+    <script>
+        var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        var randomScalingFactor = function() {    // 随机产生一个曲线数据
+            return Math.round(Math.random() * 100 * (Math.random() > 0.5 ? -1 : 1));
+        };
+
+        var ScalingFactor = function(locationX) {    // 产生一个已经在表中显示的曲线数据
+            return parseFloat(locationX);
+        };
+
+        var SF=new Array();
+        for (var i=0; i<7; ++i){
+            var bn=-20+i;
+            var bz="b"+bn;
+
+            SF[i]=parseFloat(bz.innerHTML);
+        }
+
+
+        var randomColorFactor = function() {    // 随机产生曲线颜色代表数
+            return Math.round(Math.random() * 255);
+        };
+        var randomColor = function(opacity) {    // 随机产生颜色
+            return 'rgba(' + randomColorFactor() + ',' + randomColorFactor() + ',' + randomColorFactor() + ',' + (opacity || '.3') + ')';
+        };
+
+        var config = {
+            type: 'line',
+            data: {
+                labels: ["-20", "-19", "-18", "-17", "-16", "-15", "-14", "-13", "-12", "-11", "-10", "-9", "-8", "-7", "-6", "-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"],    // 在图表中初始化横坐标
+                datasets: [{
+                    label: "单线圈R",    // 在图表中初始化第1排数据
+                    data: [0.02, 0.02, 0.03, 0.03, 0.03, 0.04, 0.04, 0.06, 0.07, 0.07, 0.07, 0.09, 0.10, 0.12, 0.15, 0.17, 0.19, 0.22, 0.26, 0.30, 0.33, 0.38, 0.42, 0.45, 0.48, 0.49, 0.49, 0.47, 0.44, 0.39, 0.36, 0.31, 0.27, 0.24, 0.20, 0.17, 0.15, 0.13, 0.11, 0.09, 0.09],
+                    fill: true,    // 设置填充颜色(默认为填充颜色)
+                    borderDash: [5, 5],    // 设置虚线(默认为实线)
+                }, {
+                    label: "双线圈R",    // 初始化第2排数据
+                    data: [0.10, 0.11, 0.13, 0.15, 0.17, 0.20, 0.24, 0.27, 0.30, 0.35, 0.40, 0.46, 0.52, 0.56, 0.61, 0.64, 0.67, 0.68, 0.68, 0.68, 0.70, 0.70, 0.70, 0.68, 0.68, 0.66, 0.64, 0.60, 0.55, 0.49, 0.43, 0.39, 0.34, 0.29, 0.26, 0.21, 0.19, 0.17, 0.15, 0.12, 0.11],
+                }, {
+                    label: "双线圈2R",    // 初始化第3排数据
+                    data: [0.17, 0.20, 0.22, 0.26, 0.30, 0.35, 0.39, 0.44, 0.47, 0.50, 0.53, 0.53, 0.53, 0.49, 0.47, 0.44, 0.40, 0.38, 0.36, 0.35, 0.34, 0.35, 0.35, 0.37, 0.39, 0.42, 0.45, 0.48, 0.52, 0.53, 0.54, 0.53, 0.50, 0.47, 0.43, 0.38, 0.32, 0.29, 0.25, 0.22, 0.19],
+                }, {
+                    label: "双线圈R/2",    // 初始化第4排数据
+                    data: [0.08, 0.10, 0.11, 0.12, 0.15, 0.17, 0.19, 0.22, 0.26, 0.30, 0.35, 0.40, 0.46, 0.53, 0.60, 0.66, 0.73, 0.80, 0.84, 0.86, 0.88, 0.88, 0.85, 0.82, 0.76, 0.71, 0.64, 0.56, 0.49, 0.44, 0.37, 0.32, 0.28, 0.24, 0.20, 0.18, 0.16, 0.13, 0.12, 0.11, 0.09],
+                }]
+            },
+            options: {
+                responsive: true,    // false时不显示纵坐标。。。
+                title:{        // 图表标题
+                    display:true,        // 显示图表标题
+                    text:"磁感应强度B关于感应线圈轴线距离X变化曲线图"    // 显示标题内容
+                },
+                tooltips: {
+                    mode: 'label',
+                    callbacks: {
+                        beforeTitle: function() {
+                            return '...beforeTitle';
+                        },
+                        afterTitle: function() {
+                            return '...afterTitle';
+                        },
+                        beforeBody: function() {
+                            return '...beforeBody';
+                        },
+                        afterBody: function() {
+                            return '...afterBody';
+                        },
+                        beforeFooter: function() {
+                            return '...beforeFooter';
+                        },
+                        footer: function() {
+                            return 'Footer';
+                        },
+                        afterFooter: function() {
+                            return '...afterFooter';
+                        },
+                    }
+                },
+                hover: {
+                    mode: 'label'
+                },
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            show: true,
+                            labelString: 'Month'
+                        }
+                    }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            show: true,
+                            labelString: 'Value'
+                        }
+                    }]
+                }
+            }
+        };
+
+        $.each(config.data.datasets, function(i, dataset) {
+            dataset.borderColor = randomColor(0.4);
+            dataset.backgroundColor = randomColor(0.5);
+            dataset.pointBorderColor = randomColor(0.7);
+            dataset.pointBackgroundColor = randomColor(0.5);
+            dataset.pointBorderWidth = 1;
+        });
+
+        window.onload = function() {
+            var ctx = document.getElementById("canvas").getContext("2d");
+            window.myLine = new Chart(ctx, config);
+
+        };
+
+        $('#randomizeData').click(function() {
+            $.each(config.data.datasets, function(i, dataset) {
+                dataset.data = dataset.data.map(function() {
+                    return randomScalingFactor();
+                });
+
+            });
+
+            window.myLine.update();
+        });
+
+        $('#addDataset').click(function() {
+            var newDataset = {
+                label: 'Dataset ' + config.data.datasets.length,
+                borderColor: randomColor(0.4),
+                backgroundColor: randomColor(0.5),
+                pointBorderColor: randomColor(0.7),
+                pointBackgroundColor: randomColor(0.5),
+                pointBorderWidth: 1,
+                data: [],
+            };
+/*
+            for (var index = 0; index < config.data.labels.length; ++index) {
+                newDataset.data.push(ScalingFactor(b20));
+            }
+*/
+            for (var index = 0; index < config.data.labels.length; ++index) {
+                newDataset.data.push(SF[index]);
+            }
+
+            config.data.datasets.push(newDataset);
+            window.myLine.update();
+        });
+
+        $('#addData').click(function() {
+            if (config.data.datasets.length > 0) {
+                var month = MONTHS[config.data.labels.length % MONTHS.length];
+                config.data.labels.push(month);
+
+                $.each(config.data.datasets, function(i, dataset) {
+                    dataset.data.push(randomScalingFactor());
+                });
+
+                window.myLine.update();
+            }
+        });
+
+        $('#removeDataset').click(function() {
+            config.data.datasets.splice(0, 1);
+            window.myLine.update();
+        });
+
+        $('#removeData').click(function() {
+            config.data.labels.splice(-1, 1); // remove the label first
+
+            config.data.datasets.forEach(function(dataset, datasetIndex) {
+                dataset.data.pop();
+            });
+
+            window.myLine.update();
+        });
+
+    </script>
+    <footer>&copy;<a href="http://github.com/ZaleJ/" target="blank">季小伦</a></footer>
+</body>
+
+</html>
